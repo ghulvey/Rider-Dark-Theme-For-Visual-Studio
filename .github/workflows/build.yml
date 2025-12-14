@@ -1,0 +1,37 @@
+name: Build VSIX
+
+on:
+  push:
+    branches: [ main, master ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Restore NuGet packages
+      run: nuget restore "Rider Dark Theme.sln"
+
+    - name: Build solution
+      run: msbuild "Rider Dark Theme.sln" /p:Configuration=Release /p:Platform="Any CPU" /p:DeployExtension=false
+
+    - name: Upload VSIX artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: rider-dark-theme-vsix
+        path: "Rider Dark Theme/bin/Release/*.vsix"
+        if-no-files-found: error
