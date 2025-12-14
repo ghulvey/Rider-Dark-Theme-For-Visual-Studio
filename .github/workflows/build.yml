@@ -42,6 +42,11 @@ jobs:
       contents: write
 
     steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: rider-dark-theme-vsix
+
     - name: Create release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -50,4 +55,5 @@ jobs:
         gh release create "$tag" \
             --repo="$GITHUB_REPOSITORY" \
             --title="${tag#v}" \
-            --generate-notes
+            --generate-notes \
+            *.vsix
